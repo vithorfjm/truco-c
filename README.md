@@ -5,6 +5,7 @@
 ---
 ### Requisitos
 - [x] Criação do baralho com 40 cartas
+- [x] Sortear 3 cartas pra cada usuário por rodada
 - [x] Hierarquia das cartas
 - [x] Condição de vitória
 - [x] Critérios de desempate
