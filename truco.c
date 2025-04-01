@@ -27,6 +27,9 @@ void moverCartas(Carta monteInicial[], Carta destino[], int indiceDestino);
 void distribuirCartas();
 void mostrarInformacoesRodada();
 void jogada(int jogador);
+void jogarCarta(int jogador);
+void aumentarValor(int jogador);
+void aceitarAumento(int jogador);
 void processarAcaoJogador(int opcao, int jogador);
 void mostrarCartasDoJogador(int jogador);
 
@@ -41,6 +44,8 @@ Carta cartasJogador2[3];
 
 int rodadaAtual = 1;
 int valorDaRodada = 1;
+bool rodadaAcabou = false;
+
 int pontosJogador1 = 0, pontosJogador2 = 0;
 
 bool aumentoPendente = false;
@@ -63,10 +68,9 @@ int main() {
         distribuirCartas();
         
         while (!rodadaAcabou) { // rodada
-            while (true) { // mao
+            while (jogadas[0].carta.numero != 0 && jogadas[1].carta.numero != 0) { // mao
                 jogada(1);
                 jogada(2);
-                
             }
 
             
@@ -218,7 +222,7 @@ void mostrarCartasDoJogador(int jogador) {
 
 void definirVencedorDaMao() {
     if (jogadas[0].carta.peso > jogadas[1].carta.peso)
-        vencedoresDasMaos[maoAtual] = 1
+        vencedoresDasMaos[maoAtual] = 1;
     else if (jogadas[1].carta.peso > jogadas[0].carta.peso)
         vencedoresDasMaos[maoAtual] = 2;
     else
