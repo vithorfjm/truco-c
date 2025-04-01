@@ -13,6 +13,7 @@ typedef struct
     char naipe[10];
     int peso;
     bool estaForaDoMonte;
+    bool foiJogada;
 } Carta;
 
 typedef struct
@@ -37,13 +38,15 @@ void definirVencedorDaMao();
 void limparMao();
 void verificarVencedorDaRodada();
 void atualizarValoresParaNovaRodada();
+void resetarOMonte();
+// void desistirDaRodada(int jogador);
 
 // VARIAVEIS GLOBAIS
 Carta monte[40] = { // O monte contendo todas as cartas do jogo
-    {"1","Espadas",12,false},{"2","Espadas",5,false},{"3","Espadas",6,false},{"4","Espadas",7,false},{"5","Espadas",8,false},{"6","Espadas",9,false},{"7","Espadas",10,false},{"10","Espadas",1,false},{"11","Espadas",2,false},{"12","Espadas",3,false},
-    {"1","Copas",4,false},{"2","Copas",5,false},{"3","Copas",6,false},{"4","Copas",7,false},{"5","Copas",8,false},{"6","Copas",9,false},{"7","Copas",13,false},{"10","Copas",1,false},{"11","Copas",2,false},{"12","Copas",3,false},
-    {"1","Ouros",4,false},{"2","Ouros",5,false},{"3","Ouros",6,false},{"4","Ouros",7,false},{"5","Ouros",8,false},{"6","Ouros",9,false},{"7","Ouros",10,false},{"10","Ouros",1,false},{"11","Ouros",2,false},{"12","Ouros",3,false},
-    {"1","Paus",11,false},{"2","Paus",5,false},{"3","Paus",6,false},{"4","Paus",14,false},{"5","Paus",8,false},{"6","Paus",9,false},{"7","Paus",10,false},{"10","Paus",1,false},{"11","Paus",2,false},{"12","Paus",3,false}};
+    {"1","Espadas",12,false,false},{"2","Espadas",5,false,false},{"3","Espadas",6,false,false},{"4","Espadas",7,false,false},{"5","Espadas",8,false,false},{"6","Espadas",9,false,false},{"7","Espadas",10,false,false},{"10","Espadas",1,false,false},{"11","Espadas",2,false,false},{"12","Espadas",3,false,false},
+    {"1","Copas",4,false,false},{"2","Copas",5,false,false},{"3","Copas",6,false,false},{"4","Copas",7,false,false},{"5","Copas",8,false,false},{"6","Copas",9,false,false},{"7","Copas",13,false,false},{"10","Copas",1,false,false},{"11","Copas",2,false,false},{"12","Copas",3,false,false},
+    {"1","Ouros",4,false,false},{"2","Ouros",5,false,false},{"3","Ouros",6,false,false},{"4","Ouros",7,false,false},{"5","Ouros",8,false,false},{"6","Ouros",9,false,false},{"7","Ouros",10,false,false},{"10","Ouros",1,false,false},{"11","Ouros",2,false,false},{"12","Ouros",3,false,false},
+    {"1","Paus",11,false,false},{"2","Paus",5,false,false},{"3","Paus",6,false,false},{"4","Paus",14,false,false},{"5","Paus",8,false,false},{"6","Paus",9,false,false},{"7","Paus",10,false,false},{"10","Paus",1,false,false},{"11","Paus",2,false,false},{"12","Paus",3,false,false}};
 Carta cartasJogador1[3];
 Carta cartasJogador2[3];
 
@@ -54,6 +57,7 @@ bool rodadaAcabou;
 
 int pontosJogador1 = 0, pontosJogador2 = 0;
 int pontosNaMaoJogador1 = 0, pontosNaMaoJogador2 = 0;
+int proximoAComecarMao = 1;
 
 bool aumentoPendente = false;
 int ultimoAumento = 0;
@@ -62,9 +66,10 @@ bool realizouAcao = false;
 int turnoAtual = 1;
 Jogada jogadas[2];
 
+// int desistente = 0;
+
 int main() {
     srand(time(0));
-
     printLogo();
     printf("\tJOGO INICIANDO...\n");
 
@@ -82,6 +87,11 @@ int main() {
             verificarVencedorDaRodada();
         }
     };
+    if (pontosJogador1 > 12) {
+      printf("\n\nJogador 1 venceu!!! PARABÉNS\n\n");
+    } else {
+        printf("\n\nJogador 2 venceu!!! PARABÉNS\n\n");
+    }
 }
 
 void moverCartas (Carta destino[], int indiceDestino) {
@@ -129,12 +139,12 @@ void mostrarMenuAcoes(int jogador) {
         printf("4. Desistir\n");
     }
 
-    if (aumentoPendente && ultimoAumento == jogador) { // esse jogador propos o aumento
+    else if (aumentoPendente && ultimoAumento == jogador) { // esse jogador propos o aumento
         printf("4. Desistir\n");
         printf("5. Terminar turno\n");
     }
     
-    if (!aumentoPendente) { // nao tem aumento pendente
+    else if (!aumentoPendente) { // nao tem aumento pendente
         if (!realizouAcao && turnoAtual == jogador) {
             printf("1. Jogar carta\n");
         }
@@ -175,9 +185,12 @@ void processarAcaoJogador(int opcao, int jogador) {
             aceitarAumento(jogador);
             break;
         case 4:
+            // desistirDaRodada(jogador);
             break;
         case 5:
             break;
+        default:
+            printf("\nOpcao invalida! Reinicie o programa\n");
     }
 }
 
@@ -187,10 +200,13 @@ void jogarCarta(int jogador) {
     fflush(stdin);
     int indexCarta;
     scanf("%d", &indexCarta);
+    indexCarta--;
     if (jogador == 1) {
-        jogadas[0].carta = cartasJogador1[indexCarta-1]; 
+        jogadas[0].carta = cartasJogador1[indexCarta]; 
+        cartasJogador1[indexCarta].foiJogada = true;
     } else {
-        jogadas[1].carta = cartasJogador2[indexCarta-1]; 
+        jogadas[1].carta = cartasJogador2[indexCarta]; 
+        cartasJogador2[indexCarta].foiJogada = true;
     }
     realizouAcao = true;
     turnoAtual = jogador == 1 ? 2 : 1; //so muda o turno quando o jogador jogar uma carta
@@ -225,13 +241,17 @@ void mostrarCartasDoJogador(int jogador) {
     printf("\nSuas cartas sao:\n");
     if (jogador == 1) {
         for (int i = 0 ; i < 3 ; i++) {
-            printf("%d. %s - %s\n", i+1, cartasJogador1[i].numero, cartasJogador1[i].naipe);
+            if (!cartasJogador1[i].foiJogada) {
+                printf("%d. %s - %s\n", i+1, cartasJogador1[i].numero, cartasJogador1[i].naipe);
+            }
         }
     }
 
     else {
         for (int i = 0 ; i < 3 ; i++) {
-            printf("%d. %s - %s\n", i+1, cartasJogador2[i].numero, cartasJogador2[i].naipe);
+            if (!cartasJogador2[i].foiJogada) {
+                printf("%d. %s - %s\n", i+1, cartasJogador2[i].numero, cartasJogador2[i].naipe);
+            }
         }
     }
 }
@@ -239,11 +259,11 @@ void mostrarCartasDoJogador(int jogador) {
 void definirVencedorDaMao() {
     if (jogadas[0].carta.peso > jogadas[1].carta.peso) {
         pontosNaMaoJogador1++;
-        printf("\n==> O jogado 1 venceu a %da mao\n", maoAtual);
+        printf("\n==> O jogador 1 venceu a %da mao\n", maoAtual);
     }
     else if (jogadas[1].carta.peso > jogadas[0].carta.peso) {
         pontosNaMaoJogador2++;
-        printf("\n==> O jogado 2 venceu a %da mao\n", maoAtual);
+        printf("\n==> O jogador 2 venceu a %da mao\n", maoAtual);
     }
     else {
         printf("\n==> A mao %d terminou em empate\n", maoAtual);
@@ -272,7 +292,7 @@ void verificarVencedorDaRodada() {
         atualizarValoresParaNovaRodada();
     } else if (maoAtual > 3) {
         rodadaAcabou = true;
-        printf("==> A rodada %d terminou em empate\n", rodadaAtual);
+        printf("\n==> A rodada %d terminou em empate\n", rodadaAtual);
         atualizarValoresParaNovaRodada();
     }
 }
@@ -293,4 +313,25 @@ void atualizarValoresParaNovaRodada() {
     valorDaRodada = 1;
     pontosNaMaoJogador1 = 0;
     pontosNaMaoJogador2 = 0;
+    resetarOMonte();
 }
+
+void resetarOMonte() {
+    for (int i = 0; i < NUM_CARTAS; i++) {
+        monte[i].estaForaDoMonte = false;
+    }
+}
+
+
+// void desistirDaRodada(int jogador) {
+//     if (jogador == 1) {
+//         printf("\n==> Jogador 1 desistiu da rodada, o Jogador 2 ganhou %d pontos\n", valorDaRodada);
+//         pontosJogador2 += valorDaRodada;
+//     } else {
+//         printf("\n==> Jogador 2 desistiu da rodada, o Jogador 1 ganhou %d pontos\n", valorDaRodada);
+//         pontosJogador1 += valorDaRodada;
+//     }
+//     // desistente = jogador;
+//     rodadaAcabou = true;
+//     atualizarValoresParaNovaRodada();
+// }
