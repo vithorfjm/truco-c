@@ -49,13 +49,12 @@ bool realizouAcao = false;
 
 int turnoAtual = 1;
 Jogada jogadas[2];
-int vencedorDaMao;
+
+int vencedoresDasMaos[3]; // 0 - empate, 1 e 2
+int maoAtual = 1;
 
 int main() {
     srand(time(0));
-
-    bool rodadaAcabou = false;
-    int vencedoresMaos[3]; // 0 empate, 1 jogador1, 2 jogador2
 
     printLogo();
     printf("\tJOGO INICIANDO...\n");
@@ -102,7 +101,6 @@ void mostrarInformacoesRodada() {
     printf("== RODADA %d ==\n", rodadaAtual);
     printf("Valor da rodada: %d\n", valorDaRodada);
     printf("Pontuacao partida: Jogador 1 [%d] x [%d] Jogador 2\n", pontosJogador1, pontosJogador2);
-    printf("Pontuacao da mao: Jogador 1 [%d] x [%d] Jogador 2\n", pontosJogador1, pontosJogador2);
 };
 
 void mostrarMenuAcoes(int jogador) {
@@ -137,15 +135,11 @@ void jogada(int jogador) {
     printf("\nTURNO DO JOGADOR %d\n", jogador);
     mostrarCartasDoJogador(jogador);
     int opcao = 0;
-    while (opcao != 5) {
+    while (opcao != 5) { // Enquanto o jogador nao finalizar a rodada, nao passa para o outro
         mostrarMenuAcoes(jogador);
         fflush(stdin);
         scanf("%d", &opcao);
         processarAcaoJogador(opcao, jogador);
-    }
-    if (jogadas[0].carta.numero != 0 && jogadas[1].carta.numero != 0) {
-        definirVencedorDaMao();
-        
     }
     realizouAcao = false;
 }
@@ -153,47 +147,58 @@ void jogada(int jogador) {
 void processarAcaoJogador(int opcao, int jogador) {
     switch (opcao) {
         case 1:
-            mostrarCartasDoJogador(jogador);
-            printf("Escolha uma carta: ");
-            fflush(stdin);
-            int indexCarta;
-            scanf("%d", &indexCarta);
-            if (jogador == 1) {
-                jogadas[0].carta = cartasJogador1[indexCarta]; 
-            } else {
-                jogadas[1].carta = cartasJogador2[indexCarta]; 
-            }
-            turnoAtual = jogador == 1 ? 2 : 1; //so muda o turno quando o jogador jogar uma carta
+            jogarCarta(jogador);
             break;
         case 2:
-            if (aumentoPendente) {
-                if (valorDaRodada == 1)
-                    valorDaRodada = 3;
-                else {
-                    valorDaRodada += 3;
-                }
-            }
-            int valorTemp = valorDaRodada == 1 ? 3 : valorDaRodada+3;
-            ultimoAumento = jogador;
-            aumentoPendente = true;
-            printf("\n==> O jogador %d propos um aumento para %d pontos\n", jogador, valorTemp);
-            realizouAcao = true;
+            aumentarValor(jogador);
             break;
         case 3:
-            if (valorDaRodada == 1)
-                valorDaRodada = 3;
-            else {
-                valorDaRodada += 3;
-            }
-            aumentoPendente = false;
-            realizouAcao = true;
+            aceitarAumento(jogador);
             break;
         case 4:
-
             break;
         case 5:
             break;
     }
+}
+
+void jogarCarta(int jogador) {
+    mostrarCartasDoJogador(jogador);
+    printf("Escolha uma carta: ");
+    fflush(stdin);
+    int indexCarta;
+    scanf("%d", &indexCarta);
+    if (jogador == 1) {
+        jogadas[0].carta = cartasJogador1[indexCarta]; 
+    } else {
+        jogadas[1].carta = cartasJogador2[indexCarta]; 
+    }
+    turnoAtual = jogador == 1 ? 2 : 1; //so muda o turno quando o jogador jogar uma carta
+}
+
+void aumentarValor(int jogador) {
+    if (aumentoPendente) {
+        if (valorDaRodada == 1)
+            valorDaRodada = 3;
+        else {
+            valorDaRodada += 3;
+        }
+    }
+    int valorTemp = valorDaRodada == 1 ? 3 : valorDaRodada+3;
+    ultimoAumento = jogador;
+    aumentoPendente = true;
+    printf("\n==> O jogador %d propos um aumento para %d pontos\n", jogador, valorTemp);
+    realizouAcao = true;
+}
+
+void aceitarAumento(int jogador) {
+    if (valorDaRodada == 1)
+        valorDaRodada = 3;
+    else {
+        valorDaRodada += 3;
+    }
+    aumentoPendente = false;
+    realizouAcao = true;
 }
 
 void mostrarCartasDoJogador(int jogador) {
@@ -213,11 +218,13 @@ void mostrarCartasDoJogador(int jogador) {
 
 void definirVencedorDaMao() {
     if (jogadas[0].carta.peso > jogadas[1].carta.peso)
-        vencedorDaMao = 1;
+        vencedoresDasMaos[maoAtual] = 1
     else if (jogadas[1].carta.peso > jogadas[0].carta.peso)
-        vencedorDaMao = 2;
+        vencedoresDasMaos[maoAtual] = 2;
     else
-        vencedorDaMao = 0;
+        vencedoresDasMaos[maoAtual] = 0;
+    maoAtual++;
+
 }
 
 void printLogo() {
