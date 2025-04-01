@@ -23,7 +23,7 @@ typedef struct
 
 // DECLARACAO DAS FUNCOES 
 void printLogo();
-void moverCartas(Carta monteInicial[], Carta destino[], int indiceDestino);
+void moverCartas(Carta destino[], int indiceDestino);
 void distribuirCartas();
 void mostrarInformacoesRodada();
 void mostrarInformacoesMao();
@@ -62,15 +62,13 @@ bool realizouAcao = false;
 int turnoAtual = 1;
 Jogada jogadas[2];
 
-int vencedoresDasMaos[3]; // 0 - empate, 1 e 2
-
 int main() {
     srand(time(0));
 
     printLogo();
     printf("\tJOGO INICIANDO...\n");
 
-    while (pontosJogador1 < 12 || pontosJogador2 < 12){ // partida completa
+    while (pontosJogador1 < 12 && pontosJogador2 < 12){ // partida completa
         distribuirCartas();
         rodadaAcabou = false;
         while (!rodadaAcabou) { // rodada
@@ -82,31 +80,27 @@ int main() {
             maoAtual++;
             limparMao();
             verificarVencedorDaRodada();
-        } 
-        
-
-
-
+        }
     };
 }
 
-void moverCartas (Carta monteInicial[], Carta destino[], int indiceDestino) {
+void moverCartas (Carta destino[], int indiceDestino) {
     int randIndex;
     do {
         randIndex = RANDOM_INDEX();
-    } while (monteInicial[randIndex].estaForaDoMonte);
-    destino[indiceDestino] = monteInicial[randIndex];
-    monteInicial[randIndex].estaForaDoMonte = true;
+    } while (monte[randIndex].estaForaDoMonte);
+    destino[indiceDestino] = monte[randIndex];
+    monte[randIndex].estaForaDoMonte = true;
 
 }
 
 void distribuirCartas() {
-    moverCartas(monte, cartasJogador1, 0);
-    moverCartas(monte, cartasJogador2, 0);
-    moverCartas(monte, cartasJogador1, 1);
-    moverCartas(monte, cartasJogador2, 1);
-    moverCartas(monte, cartasJogador1, 2);
-    moverCartas(monte, cartasJogador2, 2);
+    moverCartas(cartasJogador1, 0);
+    moverCartas(cartasJogador2, 0);
+    moverCartas(cartasJogador1, 1);
+    moverCartas(cartasJogador2, 1);
+    moverCartas(cartasJogador1, 2);
+    moverCartas(cartasJogador2, 2);
 }
 
 void mostrarInformacoesRodada() {
@@ -244,17 +238,17 @@ void mostrarCartasDoJogador(int jogador) {
 
 void definirVencedorDaMao() {
     if (jogadas[0].carta.peso > jogadas[1].carta.peso) {
-        vencedoresDasMaos[maoAtual] = 1;
         pontosNaMaoJogador1++;
+        printf("\n==> O jogado 1 venceu a %da mao\n", maoAtual);
     }
     else if (jogadas[1].carta.peso > jogadas[0].carta.peso) {
-        vencedoresDasMaos[maoAtual] = 2;
         pontosNaMaoJogador2++;
+        printf("\n==> O jogado 2 venceu a %da mao\n", maoAtual);
     }
     else {
-        vencedoresDasMaos[maoAtual] = 0;
-
+        printf("\n==> A mao %d terminou em empate\n", maoAtual);
     }
+
 }
 
 void limparMao() {
