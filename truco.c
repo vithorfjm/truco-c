@@ -26,6 +26,7 @@ void printLogo();
 void moverCartas(Carta monteInicial[], Carta destino[], int indiceDestino);
 void distribuirCartas();
 void mostrarInformacoesRodada();
+void mostrarInformacoesMao();
 void jogada(int jogador);
 void jogarCarta(int jogador);
 void aumentarValor(int jogador);
@@ -44,10 +45,12 @@ Carta cartasJogador1[3];
 Carta cartasJogador2[3];
 
 int rodadaAtual = 1;
+int maoAtual = 1;
 int valorDaRodada = 1;
 bool rodadaAcabou = false;
 
 int pontosJogador1 = 0, pontosJogador2 = 0;
+int pontosNaMaoJogador1 = 0, pontosNaMaoJogador2 = 0;
 
 bool aumentoPendente = false;
 int ultimoAumento = 0;
@@ -57,7 +60,6 @@ int turnoAtual = 1;
 Jogada jogadas[2];
 
 int vencedoresDasMaos[3]; // 0 - empate, 1 e 2
-int maoAtual = 1;
 
 int main() {
     srand(time(0));
@@ -74,6 +76,7 @@ int main() {
                 jogada(2);
             }
             definirVencedorDaMao();
+            maoAtual++;
         } 
         
 
@@ -107,6 +110,17 @@ void mostrarInformacoesRodada() {
     printf("Pontuacao partida: Jogador 1 [%d] x [%d] Jogador 2\n", pontosJogador1, pontosJogador2);
 };
 
+void mostrarInformacoesMao() {
+    printf("\nMao atual: %d\n", maoAtual);
+    printf("Pontuacao da rodada: Jogador 1 [%d] x [%d] Jogador 2\n", pontosNaMaoJogador1, pontosNaMaoJogador2);
+    printf("Ultima carta jogada pelo 1: %s de %s\n",  //exibe a carta jogada pelo jogador 1, caso tenha jogado
+        jogadas[0].carta.numero[0] == '\0' ? "Ainda nao jogou nessa mao" : jogadas[0].carta.numero,
+        jogadas[0].carta.naipe[0] == '\0' ? "" : jogadas[0].carta.naipe);
+    printf("Ultima carta jogada pelo 2: %s de %s\n", //exibe a carta jogada pelo jogador 2, caso tenha jogado
+        jogadas[1].carta.numero[0] == '\0' ? "Ainda nao jogou nessa mao" : jogadas[1].carta.numero,
+        jogadas[1].carta.naipe[0] == '\0' ? "" : jogadas[1].carta.naipe);
+}
+
 void mostrarMenuAcoes(int jogador) {
     printf("\nMENU\n");
     if (aumentoPendente && ultimoAumento != jogador) { // outro jogador propos um aumento
@@ -136,6 +150,7 @@ void mostrarMenuAcoes(int jogador) {
 
 void jogada(int jogador) {
     mostrarInformacoesRodada();
+    mostrarInformacoesMao();
     printf("\nTURNO DO JOGADOR %d\n", jogador);
     mostrarCartasDoJogador(jogador);
     int opcao = 0;
@@ -173,9 +188,9 @@ void jogarCarta(int jogador) {
     int indexCarta;
     scanf("%d", &indexCarta);
     if (jogador == 1) {
-        jogadas[0].carta = cartasJogador1[indexCarta]; 
+        jogadas[0].carta = cartasJogador1[indexCarta-1]; 
     } else {
-        jogadas[1].carta = cartasJogador2[indexCarta]; 
+        jogadas[1].carta = cartasJogador2[indexCarta-1]; 
     }
     realizouAcao = true;
     turnoAtual = jogador == 1 ? 2 : 1; //so muda o turno quando o jogador jogar uma carta
@@ -222,12 +237,18 @@ void mostrarCartasDoJogador(int jogador) {
 }
 
 void definirVencedorDaMao() {
-    if (jogadas[0].carta.peso > jogadas[1].carta.peso)
+    if (jogadas[0].carta.peso > jogadas[1].carta.peso) {
         vencedoresDasMaos[maoAtual] = 1;
-    else if (jogadas[1].carta.peso > jogadas[0].carta.peso)
+        pontosNaMaoJogador1++;
+    }
+    else if (jogadas[1].carta.peso > jogadas[0].carta.peso) {
         vencedoresDasMaos[maoAtual] = 2;
-    else
+        pontosNaMaoJogador2++;
+    }
+    else {
         vencedoresDasMaos[maoAtual] = 0;
+
+    }
     maoAtual++;
 
 }
