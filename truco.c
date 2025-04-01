@@ -32,6 +32,7 @@ void aumentarValor(int jogador);
 void aceitarAumento(int jogador);
 void processarAcaoJogador(int opcao, int jogador);
 void mostrarCartasDoJogador(int jogador);
+void definirVencedorDaMao();
 
 // VARIAVEIS GLOBAIS
 Carta monte[40] = { // O monte contendo todas as cartas do jogo
@@ -72,8 +73,7 @@ int main() {
                 jogada(1);
                 jogada(2);
             }
-
-            
+            definirVencedorDaMao();
         } 
         
 
@@ -121,10 +121,10 @@ void mostrarMenuAcoes(int jogador) {
     }
     
     if (!aumentoPendente) { // nao tem aumento pendente
-        if (!realizouAcao || turnoAtual == jogador) {
+        if (!realizouAcao && turnoAtual == jogador) {
             printf("1. Jogar carta\n");
         }
-        if (ultimoAumento != jogador) { // se o ultimo aumento foi proposto por esse jogador, entao ele n pode aumentar dnv
+        if (ultimoAumento != jogador && !realizouAcao) { // se o ultimo aumento foi proposto por esse jogador, entao ele n pode aumentar dnv
             printf("2. Aumentar\n");
         }
         printf("4. Desistir\n");
@@ -177,6 +177,7 @@ void jogarCarta(int jogador) {
     } else {
         jogadas[1].carta = cartasJogador2[indexCarta]; 
     }
+    realizouAcao = true;
     turnoAtual = jogador == 1 ? 2 : 1; //so muda o turno quando o jogador jogar uma carta
 }
 
