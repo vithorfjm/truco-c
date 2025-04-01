@@ -36,6 +36,7 @@ void mostrarCartasDoJogador(int jogador);
 void definirVencedorDaMao();
 void limparMao();
 void verificarVencedorDaRodada();
+void atualizarValoresParaNovaRodada();
 
 // VARIAVEIS GLOBAIS
 Carta monte[40] = { // O monte contendo todas as cartas do jogo
@@ -49,7 +50,7 @@ Carta cartasJogador2[3];
 int rodadaAtual = 1;
 int maoAtual = 1;
 int valorDaRodada = 1;
-bool rodadaAcabou = false;
+bool rodadaAcabou;
 
 int pontosJogador1 = 0, pontosJogador2 = 0;
 int pontosNaMaoJogador1 = 0, pontosNaMaoJogador2 = 0;
@@ -71,7 +72,7 @@ int main() {
 
     while (pontosJogador1 < 12 || pontosJogador2 < 12){ // partida completa
         distribuirCartas();
-        
+        rodadaAcabou = false;
         while (!rodadaAcabou) { // rodada
             while (jogadas[0].carta.numero[0] == '\0' || jogadas[1].carta.numero[0] == '\0') { // mao
                 jogada(1);
@@ -268,14 +269,17 @@ void verificarVencedorDaRodada() {
     if (pontosNaMaoJogador1 == 2) {
         pontosJogador1 += valorDaRodada;
         rodadaAcabou = true;
-        printf("\nO jogador 1 venceu a rodada %d por um placar de [%d] a [%d] e ganhou %d ponto(s)", rodadaAtual, pontosNaMaoJogador1, pontosNaMaoJogador2, valorDaRodada);
+        printf("\n==> O jogador 1 venceu a rodada %d por um placar de [%d] a [%d] e ganhou %d ponto(s)\n", rodadaAtual, pontosNaMaoJogador1, pontosNaMaoJogador2, valorDaRodada);
+        atualizarValoresParaNovaRodada();
     } else if (pontosNaMaoJogador2 == 2) {
         pontosJogador2 += valorDaRodada;
         rodadaAcabou = true;
-        printf("\nO jogador 2 venceu a rodada %d por um placar de [%d] a [%d] e ganhou %d ponto(s)", rodadaAtual, pontosNaMaoJogador2, pontosNaMaoJogador1, valorDaRodada);
-    } else if (maoAtual == 3) {
+        printf("\n==> O jogador 2 venceu a rodada %d por um placar de [%d] a [%d] e ganhou %d ponto(s)\n", rodadaAtual, pontosNaMaoJogador2, pontosNaMaoJogador1, valorDaRodada);
+        atualizarValoresParaNovaRodada();
+    } else if (maoAtual > 3) {
         rodadaAcabou = true;
-        printf("A rodada %d terminou em empate", rodadaAtual);
+        printf("==> A rodada %d terminou em empate\n", rodadaAtual);
+        atualizarValoresParaNovaRodada();
     }
 }
 
@@ -286,4 +290,13 @@ void printLogo() {
     printf("| (__) || ()() || :\\/: || :\\/: || :\\/: |\n");
     printf("| '--'T|| '--'R|| '--'U|| '--'C|| '--'O|\n");
     printf("`------'`------'`------'`------'`------'\n");
+}
+
+void atualizarValoresParaNovaRodada() {
+    limparMao();
+    rodadaAtual++;
+    maoAtual = 1;
+    valorDaRodada = 1;
+    pontosNaMaoJogador1 = 0;
+    pontosNaMaoJogador2 = 0;
 }
