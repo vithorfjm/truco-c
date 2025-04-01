@@ -34,6 +34,8 @@ void aceitarAumento(int jogador);
 void processarAcaoJogador(int opcao, int jogador);
 void mostrarCartasDoJogador(int jogador);
 void definirVencedorDaMao();
+void limparMao();
+void verificarVencedorDaRodada();
 
 // VARIAVEIS GLOBAIS
 Carta monte[40] = { // O monte contendo todas as cartas do jogo
@@ -71,14 +73,17 @@ int main() {
         distribuirCartas();
         
         while (!rodadaAcabou) { // rodada
-            while (jogadas[0].carta.numero != 0 && jogadas[1].carta.numero != 0) { // mao
+            while (jogadas[0].carta.numero[0] == '\0' || jogadas[1].carta.numero[0] == '\0') { // mao
                 jogada(1);
                 jogada(2);
             }
             definirVencedorDaMao();
             maoAtual++;
+            limparMao();
+            verificarVencedorDaRodada();
         } 
         
+
 
 
     };
@@ -113,10 +118,10 @@ void mostrarInformacoesRodada() {
 void mostrarInformacoesMao() {
     printf("\nMao atual: %d\n", maoAtual);
     printf("Pontuacao da rodada: Jogador 1 [%d] x [%d] Jogador 2\n", pontosNaMaoJogador1, pontosNaMaoJogador2);
-    printf("Ultima carta jogada pelo 1: %s de %s\n",  //exibe a carta jogada pelo jogador 1, caso tenha jogado
+    printf("Ultima carta jogada pelo 1: %s %s\n",  //exibe a carta jogada pelo jogador 1, caso tenha jogado
         jogadas[0].carta.numero[0] == '\0' ? "Ainda nao jogou nessa mao" : jogadas[0].carta.numero,
         jogadas[0].carta.naipe[0] == '\0' ? "" : jogadas[0].carta.naipe);
-    printf("Ultima carta jogada pelo 2: %s de %s\n", //exibe a carta jogada pelo jogador 2, caso tenha jogado
+    printf("Ultima carta jogada pelo 2: %s %s\n", //exibe a carta jogada pelo jogador 2, caso tenha jogado
         jogadas[1].carta.numero[0] == '\0' ? "Ainda nao jogou nessa mao" : jogadas[1].carta.numero,
         jogadas[1].carta.naipe[0] == '\0' ? "" : jogadas[1].carta.naipe);
 }
@@ -249,8 +254,29 @@ void definirVencedorDaMao() {
         vencedoresDasMaos[maoAtual] = 0;
 
     }
-    maoAtual++;
+}
 
+void limparMao() {
+    jogadas[0].carta.numero[0] = '\0';
+    jogadas[0].carta.naipe[0] = '\0';
+    jogadas[1].carta.numero[0] = '\0';
+    jogadas[1].carta.naipe[0] = '\0';
+    
+}
+
+void verificarVencedorDaRodada() {
+    if (pontosNaMaoJogador1 == 2) {
+        pontosJogador1 += valorDaRodada;
+        rodadaAcabou = true;
+        printf("\nO jogador 1 venceu a rodada %d por um placar de [%d] a [%d] e ganhou %d ponto(s)", rodadaAtual, pontosNaMaoJogador1, pontosNaMaoJogador2, valorDaRodada);
+    } else if (pontosNaMaoJogador2 == 2) {
+        pontosJogador2 += valorDaRodada;
+        rodadaAcabou = true;
+        printf("\nO jogador 2 venceu a rodada %d por um placar de [%d] a [%d] e ganhou %d ponto(s)", rodadaAtual, pontosNaMaoJogador2, pontosNaMaoJogador1, valorDaRodada);
+    } else if (maoAtual == 3) {
+        rodadaAcabou = true;
+        printf("A rodada %d terminou em empate", rodadaAtual);
+    }
 }
 
 void printLogo() {
